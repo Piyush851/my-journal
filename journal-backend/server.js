@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const connectDB = require("./config/db");
+const mongoose = require("mongoose");
 
 const authRoutes = require("./routes/authRoutes");
 const entryRoutes = require("./routes/entryRoutes");
@@ -24,6 +25,12 @@ app.use("/api/entries", entryRoutes);
 app.get("/api/health", (req, res) => {
     res.json({ status: "ok", message: "Journal API running" });
 });
+
+app.get("/api/check-db", async (req, res) => {
+    const dbName = mongoose.connection.name;
+    return res.json({ connectedDatabase: dbName });
+});
+
 
 // Error Handler
 app.use((err, req, res, next) => {

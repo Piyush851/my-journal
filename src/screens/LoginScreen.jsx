@@ -8,23 +8,36 @@ import {
     StatusBar,
     Alert,
 } from 'react-native';
-import AuthService from '../services/AuthService';
+import ApiService from '../services/api';   // ✅ Correct import
 import styles from '../styles/styles';
 
 export default function LoginScreen({ onLogin, onNavigateToSignup }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (!email || !password) {
             Alert.alert('Error', 'Please fill in all fields');
             return;
         }
-        const result = AuthService.login(email, password);
-        if (result.success) {
-            onLogin(result.user);
-        } else {
-            Alert.alert('Error', result.error);
+
+        try {
+            setLoading(true);
+
+            console.log("📤 Sending login request:", email);
+
+            const result = await ApiService.login(email, password);
+
+            console.log("✅ Login success:", result);
+
+            onLogin(result.user);  // ✅ Update global state with real backend user
+
+        } catch (error) {
+            console.log("❌ Login error:", error.message);
+            Alert.alert('Login Failed', error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -32,6 +45,7 @@ export default function LoginScreen({ onLogin, onNavigateToSignup }) {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" />
             <View style={styles.authContainer}>
+                
                 <View style={styles.headerSection}>
                     <Text style={styles.logo}>📔</Text>
                     <Text style={styles.title}>My Journal</Text>
@@ -39,6 +53,7 @@ export default function LoginScreen({ onLogin, onNavigateToSignup }) {
                 </View>
 
                 <View style={styles.formSection}>
+
                     <TextInput
                         style={styles.input}
                         placeholder="Email"
@@ -48,6 +63,7 @@ export default function LoginScreen({ onLogin, onNavigateToSignup }) {
                         autoCapitalize="none"
                         placeholderTextColor="#999"
                     />
+
                     <TextInput
                         style={styles.input}
                         placeholder="Password"
@@ -57,8 +73,14 @@ export default function LoginScreen({ onLogin, onNavigateToSignup }) {
                         placeholderTextColor="#999"
                     />
 
-                    <TouchableOpacity style={styles.primaryButton} onPress={handleLogin}>
-                        <Text style={styles.primaryButtonText}>Sign In</Text>
+                    <TouchableOpacity
+                        style={styles.primaryButton}
+                        onPress={handleLogin}
+                        disabled={loading}
+                    >
+                        <Text style={styles.primaryButtonText}>
+                            {loading ? "Signing In..." : "Sign In"}
+                        </Text>
                     </TouchableOpacity>
 
                     <View style={styles.divider}>
@@ -71,7 +93,10 @@ export default function LoginScreen({ onLogin, onNavigateToSignup }) {
                         <Text style={styles.secondaryButtonText}>Create New Account</Text>
                     </TouchableOpacity>
 
-                    <Text style={styles.demoText}>Demo: demo@journal.com / demo123</Text>
+                    <Text style={styles.demoText}>
+                        Demo: demo@journal.com / demo123
+                    </Text>
+
                 </View>
             </View>
         </SafeAreaView>

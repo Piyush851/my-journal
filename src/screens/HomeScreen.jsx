@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -7,19 +7,53 @@ import {
     SafeAreaView,
     StatusBar,
 } from 'react-native';
+import ApiService from '../services/api';
 import styles from '../styles/styles';
 
-export default function HomeScreen({ user, entries, onAddEntry, onEditEntry, onLogout }) {
+export default function HomeScreen({ user, onAddEntry, onEditEntry, onLogout }) {
+    const [entries, setEntries] = useState([]);
+
+    // ✅ Load entries when screen opens
+    useEffect(() => {
+        loadEntries();
+    }, []);
+
+    // ✅ Fetch from backend
+    const loadEntries = async () => {
+        try {
+            const res = await ApiService.getEntries();
+
+            const normalized = res.entries.map(e => ({
+                ...e,
+                date: new Date(e.date)  // ✅ Fix string → Date
+            }));
+
+            setEntries(normalized);
+
+        } catch (error) {
+            console.log("❌ Error loading entries:", error.message);
+        }
+    };
+
     const sortedEntries = [...entries].sort((a, b) => b.date - a.date);
 
     const formatDate = (date) => {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return date.toLocaleDateString('en-US', options);
+        return date.toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+        });
     };
 
     const getMoodEmoji = (mood) => {
-        const moods = { happy: '😊', sad: '😢', excited: '🤩', calm: '😌', anxious: '😰' };
-        return moods[mood] || '😊';
+        const moods = {
+            happy: "😊",
+            sad: "😢",
+            excited: "🤩",
+            calm: "😌",
+            anxious: "😰",
+        };
+        return moods[mood] || "😊";
     };
 
     return (
@@ -43,6 +77,7 @@ export default function HomeScreen({ user, entries, onAddEntry, onEditEntry, onL
                     <Text style={styles.statNumber}>{entries.length}</Text>
                     <Text style={styles.statLabel}>Total Entries</Text>
                 </View>
+
                 <View style={styles.statCard}>
                     <Text style={styles.statNumber}>
                         {entries.filter(e => {
@@ -54,7 +89,7 @@ export default function HomeScreen({ user, entries, onAddEntry, onEditEntry, onL
                 </View>
             </View>
 
-            {/* Entries List */}
+            {/* Entries */}
             <ScrollView style={styles.entriesList} showsVerticalScrollIndicator={false}>
                 {sortedEntries.length === 0 ? (
                     <View style={styles.emptyState}>
@@ -65,7 +100,7 @@ export default function HomeScreen({ user, entries, onAddEntry, onEditEntry, onL
                 ) : (
                     sortedEntries.map((entry) => (
                         <TouchableOpacity
-                            key={entry.id}
+                            key={entry._id}     // ✅ FIXED
                             style={styles.entryCard}
                             onPress={() => onEditEntry(entry)}
                         >
@@ -73,6 +108,7 @@ export default function HomeScreen({ user, entries, onAddEntry, onEditEntry, onL
                                 <Text style={styles.entryMood}>{getMoodEmoji(entry.mood)}</Text>
                                 <Text style={styles.entryDate}>{formatDate(entry.date)}</Text>
                             </View>
+
                             <Text style={styles.entryTitle}>{entry.title}</Text>
                             <Text style={styles.entryContent} numberOfLines={2}>
                                 {entry.content}
@@ -83,10 +119,7 @@ export default function HomeScreen({ user, entries, onAddEntry, onEditEntry, onL
             </ScrollView>
 
             {/* Add Button */}
-            <TouchableOpacity
-                style={styles.fab}
-                onPress={onAddEntry}
-            >
+            <TouchableOpacity style={styles.fab} onPress={onAddEntry}>
                 <Text style={styles.fabIcon}>+</Text>
             </TouchableOpacity>
         </SafeAreaView>

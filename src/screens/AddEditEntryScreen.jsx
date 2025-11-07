@@ -8,12 +8,14 @@ import {
     SafeAreaView,
     Alert,
 } from 'react-native';
+import ApiService from '../services/api';
 import styles from '../styles/styles';
 
 export default function AddEditEntryScreen({ entry, onSave, onDelete, onCancel }) {
     const [title, setTitle] = useState(entry?.title || '');
     const [content, setContent] = useState(entry?.content || '');
     const [mood, setMood] = useState(entry?.mood || 'happy');
+    const [loading, setLoading] = useState(false);
 
     const moods = [
         { value: 'happy', emoji: '😊', label: 'Happy' },
@@ -23,27 +25,70 @@ export default function AddEditEntryScreen({ entry, onSave, onDelete, onCancel }
         { value: 'anxious', emoji: '😰', label: 'Anxious' },
     ];
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!title.trim() || !content.trim()) {
             Alert.alert('Error', 'Please fill in all fields');
             return;
         }
-        onSave({ title, content, mood });
+
+        try {
+            setLoading(true);
+
+            let result;
+
+            if (entry) {
+                // ✅ Update existing entry
+                console.log("📤 Updating entry:", entry._id);
+                result = await ApiService.updateEntry(entry._id, {
+                    title,
+                    content,
+                    mood
+                });
+            } else {
+                // ✅ Create new entry
+                console.log("📤 Creating new entry");
+                result = await ApiService.createEntry({
+                    title,
+                    content,
+                    mood
+                });
+            }
+
+            console.log("✅ Entry saved:", result);
+            onSave(); // tells parent to reload list and go back
+
+        } catch (error) {
+            console.log("❌ Save Error:", error.message);
+            Alert.alert("Error", error.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleDelete = () => {
         Alert.alert(
-            'Delete Entry',
-            'Are you sure you want to delete this entry?',
+            "Delete Entry",
+            "Are you sure you want to delete this entry?",
             [
-                { text: 'Cancel', style: 'cancel' },
+                { text: "Cancel", style: "cancel" },
                 {
-                    text: 'Delete',
-                    style: 'destructive',
-                    onPress: () => onDelete(entry.id)
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: deleteEntryBackend
                 }
             ]
         );
+    };
+
+    const deleteEntryBackend = async () => {
+        try {
+            console.log("🗑 Deleting entry:", entry._id);
+            await ApiService.deleteEntry(entry._id);
+            onDelete(); // reload list
+        } catch (error) {
+            console.log("❌ Delete Error:", error.message);
+            Alert.alert("Error", error.message);
+        }
     };
 
     return (
@@ -52,19 +97,29 @@ export default function AddEditEntryScreen({ entry, onSave, onDelete, onCancel }
                 <TouchableOpacity onPress={onCancel}>
                     <Text style={styles.modalButton}>Cancel</Text>
                 </TouchableOpacity>
-                <Text style={styles.modalTitle}>{entry ? 'Edit Entry' : 'New Entry'}</Text>
-                <TouchableOpacity onPress={handleSave}>
-                    <Text style={[styles.modalButton, styles.modalSaveButton]}>Save</Text>
+
+                <Text style={styles.modalTitle}>
+                    {entry ? 'Edit Entry' : 'New Entry'}
+                </Text>
+
+                <TouchableOpacity onPress={handleSave} disabled={loading}>
+                    <Text style={[styles.modalButton, styles.modalSaveButton]}>
+                        {loading ? "Saving..." : "Save"}
+                    </Text>
                 </TouchableOpacity>
             </View>
 
             <ScrollView style={styles.modalContent}>
                 <Text style={styles.label}>How are you feeling?</Text>
+
                 <View style={styles.moodSelector}>
                     {moods.map((m) => (
                         <TouchableOpacity
                             key={m.value}
-                            style={[styles.moodOption, mood === m.value && styles.moodOptionSelected]}
+                            style={[
+                                styles.moodOption,
+                                mood === m.value && styles.moodOptionSelected
+                            ]}
                             onPress={() => setMood(m.value)}
                         >
                             <Text style={styles.moodEmoji}>{m.emoji}</Text>

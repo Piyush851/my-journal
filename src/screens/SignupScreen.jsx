@@ -8,7 +8,7 @@ import {
     StatusBar,
     Alert,
 } from 'react-native';
-import AuthService from '../services/AuthService';
+import ApiService from '../services/api';   // ✅ Correct import
 import styles from '../styles/styles';
 
 export default function SignupScreen({ onSignup, onNavigateToLogin }) {
@@ -16,8 +16,9 @@ export default function SignupScreen({ onSignup, onNavigateToLogin }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleSignup = () => {
+    const handleSignup = async () => {
         if (!name || !email || !password || !confirmPassword) {
             Alert.alert('Error', 'Please fill in all fields');
             return;
@@ -30,18 +31,32 @@ export default function SignupScreen({ onSignup, onNavigateToLogin }) {
             Alert.alert('Error', 'Password must be at least 6 characters');
             return;
         }
-        const result = AuthService.signup(email, password, name);
-        if (result.success) {
-            onSignup(result.user);
-        } else {
-            Alert.alert('Error', result.error);
+
+        try {
+            setLoading(true);
+
+            console.log("📤 Calling backend API:", email);
+
+            const result = await ApiService.signup(name, email, password);
+
+            console.log("✅ Signup success:", result);
+
+            onSignup(result.user);   // ✅ Pass real backend user
+
+        } catch (error) {
+            console.log("❌ Signup error:", error.message);
+            Alert.alert('Signup Failed', error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" />
+
             <View style={styles.authContainer}>
+
                 <View style={styles.headerSection}>
                     <Text style={styles.logo}>📔</Text>
                     <Text style={styles.title}>Create Account</Text>
@@ -49,6 +64,7 @@ export default function SignupScreen({ onSignup, onNavigateToLogin }) {
                 </View>
 
                 <View style={styles.formSection}>
+
                     <TextInput
                         style={styles.input}
                         placeholder="Full Name"
@@ -56,6 +72,7 @@ export default function SignupScreen({ onSignup, onNavigateToLogin }) {
                         onChangeText={setName}
                         placeholderTextColor="#999"
                     />
+
                     <TextInput
                         style={styles.input}
                         placeholder="Email"
@@ -65,6 +82,7 @@ export default function SignupScreen({ onSignup, onNavigateToLogin }) {
                         autoCapitalize="none"
                         placeholderTextColor="#999"
                     />
+
                     <TextInput
                         style={styles.input}
                         placeholder="Password"
@@ -73,6 +91,7 @@ export default function SignupScreen({ onSignup, onNavigateToLogin }) {
                         secureTextEntry
                         placeholderTextColor="#999"
                     />
+
                     <TextInput
                         style={styles.input}
                         placeholder="Confirm Password"
@@ -82,13 +101,22 @@ export default function SignupScreen({ onSignup, onNavigateToLogin }) {
                         placeholderTextColor="#999"
                     />
 
-                    <TouchableOpacity style={styles.primaryButton} onPress={handleSignup}>
-                        <Text style={styles.primaryButtonText}>Sign Up</Text>
+                    <TouchableOpacity
+                        style={styles.primaryButton}
+                        onPress={handleSignup}
+                        disabled={loading}
+                    >
+                        <Text style={styles.primaryButtonText}>
+                            {loading ? "Creating Account..." : "Sign Up"}
+                        </Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.linkButton} onPress={onNavigateToLogin}>
-                        <Text style={styles.linkButtonText}>Already have an account? Sign In</Text>
+                        <Text style={styles.linkButtonText}>
+                            Already have an account? Sign In
+                        </Text>
                     </TouchableOpacity>
+
                 </View>
             </View>
         </SafeAreaView>

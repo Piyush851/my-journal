@@ -1,17 +1,13 @@
-// ============================================
-// API SERVICE - src/services/api.js
-// ============================================
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'http://192.168.1.5:5000/api'; // Change to your server URL
+import { API_URL } from "../config/apiConfig";
+
 
 class ApiService {
     constructor() {
         this.token = null;
     }
 
-    // Set auth token
     async setToken(token) {
         this.token = token;
         if (token) {
@@ -21,7 +17,6 @@ class ApiService {
         }
     }
 
-    // Get auth token
     async getToken() {
         if (!this.token) {
             this.token = await AsyncStorage.getItem('authToken');
@@ -29,7 +24,6 @@ class ApiService {
         return this.token;
     }
 
-    // Make authenticated request
     async request(endpoint, options = {}) {
         const token = await this.getToken();
 
@@ -43,6 +37,7 @@ class ApiService {
         };
 
         try {
+            console.log(`📡 API Call: ${API_URL}${endpoint}`);
             const response = await fetch(`${API_URL}${endpoint}`, config);
             const data = await response.json();
 
@@ -52,6 +47,7 @@ class ApiService {
 
             return data;
         } catch (error) {
+            console.error('❌ API Error:', error.message);
             throw error;
         }
     }
@@ -71,6 +67,8 @@ class ApiService {
     }
 
     async signup(name, email, password) {
+        console.log("📤 Sending signup request to:", `${API_URL}/auth/signup`);
+
         const data = await this.request('/auth/signup', {
             method: 'POST',
             body: JSON.stringify({ name, email, password }),
@@ -126,7 +124,3 @@ class ApiService {
 }
 
 export default new ApiService();
-
-
-// ============================================
-// UPDATED LOGIN

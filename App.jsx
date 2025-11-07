@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import LoginScreen from './src/screens/LoginScreen';
 import SignupScreen from './src/screens/SignupScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import AddEditEntryScreen from './src/screens/AddEditEntryScreen';
+import ApiService from './src/services/api';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState('login');
@@ -10,61 +11,76 @@ export default function App() {
   const [entries, setEntries] = useState([]);
   const [editingEntry, setEditingEntry] = useState(null);
 
-  useEffect(() => {
-    fetch("http://192.168.1.5:5000/api/health")
-      .then(res => res.json())
-      .then(data => console.log("✅ Connected:", data))
-      .catch(err => console.log("❌ Error:", err));
-  }, []);
+  // ✅ Load entries from backend on login
+  const loadEntries = async () => {
+    try {
+      const res = await ApiService.getEntries();
+      const normalized = res.entries.map(e => ({
+        ...e,
+        date: new Date(e.date)
+      }));
+      setEntries(normalized);
+    } catch (error) {
+      console.log("❌ Error loading entries:", error.message);
+    }
+  };
 
-
-  const handleLogin = (userData) => {
+  // ✅ LOGIN
+  const handleLogin = async (userData) => {
     setUser(userData);
+    await loadEntries();
     setCurrentScreen('home');
   };
 
-  const handleSignup = (userData) => {
+  // ✅ SIGNUP
+  const handleSignup = async (userData) => {
     setUser(userData);
+    await loadEntries();
     setCurrentScreen('home');
   };
 
-  const handleLogout = () => {
+  // ✅ LOGOUT
+  const handleLogout = async () => {
+    await ApiService.logout();
     setUser(null);
     setEntries([]);
     setCurrentScreen('login');
   };
 
-  const handleAddEntry = (entryData) => {
-    const newEntry = {
-      id: Date.now().toString(),
-      ...entryData,
-      date: new Date(),
-    };
-    setEntries([...entries, newEntry]);
+  // ✅ ADD ENTRY (backend)
+  const handleAddEntry = async () => {
+    setEditingEntry(null);
+    setCurrentScreen('addEntry');
+  };
+
+  const saveNewEntry = async (entryData) => {
+    await ApiService.createEntry(entryData);
+    await loadEntries(); // refresh
     setCurrentScreen('home');
   };
 
+  // ✅ EDIT ENTRY (backend)
   const handleEditEntry = (entry) => {
     setEditingEntry(entry);
     setCurrentScreen('editEntry');
   };
 
-  const handleUpdateEntry = (entryData) => {
-    setEntries(entries.map(e =>
-      e.id === editingEntry.id
-        ? { ...e, ...entryData, date: e.date }
-        : e
-    ));
+  const updateEntry = async (entryData) => {
+    await ApiService.updateEntry(editingEntry._id, entryData);
+    await loadEntries();
     setEditingEntry(null);
     setCurrentScreen('home');
   };
 
-  const handleDeleteEntry = (entryId) => {
-    setEntries(entries.filter(e => e.id !== entryId));
+  // ✅ DELETE ENTRY (backend)
+  const deleteEntry = async () => {
+    await ApiService.deleteEntry(editingEntry._id);
+    await loadEntries();
     setEditingEntry(null);
     setCurrentScreen('home');
   };
 
+  // ✅ SCREEN ROUTING
   const renderScreen = () => {
     switch (currentScreen) {
       case 'login':
@@ -74,6 +90,7 @@ export default function App() {
             onNavigateToSignup={() => setCurrentScreen('signup')}
           />
         );
+
       case 'signup':
         return (
           <SignupScreen
@@ -81,32 +98,35 @@ export default function App() {
             onNavigateToLogin={() => setCurrentScreen('login')}
           />
         );
+
       case 'home':
         return (
           <HomeScreen
             user={user}
-            entries={entries}
-            onAddEntry={() => setCurrentScreen('addEntry')}
+            onAddEntry={handleAddEntry}
             onEditEntry={handleEditEntry}
             onLogout={handleLogout}
           />
         );
+
       case 'addEntry':
         return (
           <AddEditEntryScreen
-            onSave={handleAddEntry}
+            onSave={saveNewEntry}
             onCancel={() => setCurrentScreen('home')}
           />
         );
+
       case 'editEntry':
         return (
           <AddEditEntryScreen
             entry={editingEntry}
-            onSave={handleUpdateEntry}
-            onDelete={handleDeleteEntry}
+            onSave={updateEntry}
+            onDelete={deleteEntry}
             onCancel={() => setCurrentScreen('home')}
           />
         );
+
       default:
         return null;
     }
