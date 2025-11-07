@@ -326,4 +326,11 @@ export default StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
     },
+    centered: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    buttonDisabled: {
+        opacity: 0.6,
+    },
 });

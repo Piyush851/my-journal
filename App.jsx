@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LoginScreen from './src/screens/LoginScreen';
 import SignupScreen from './src/screens/SignupScreen';
 import HomeScreen from './src/screens/HomeScreen';
@@ -9,6 +9,14 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [entries, setEntries] = useState([]);
   const [editingEntry, setEditingEntry] = useState(null);
+
+  useEffect(() => {
+    fetch("http://192.168.1.5:5000/api/health")
+      .then(res => res.json())
+      .then(data => console.log("✅ Connected:", data))
+      .catch(err => console.log("❌ Error:", err));
+  }, []);
+
 
   const handleLogin = (userData) => {
     setUser(userData);
@@ -42,8 +50,8 @@ export default function App() {
   };
 
   const handleUpdateEntry = (entryData) => {
-    setEntries(entries.map(e => 
-      e.id === editingEntry.id 
+    setEntries(entries.map(e =>
+      e.id === editingEntry.id
         ? { ...e, ...entryData, date: e.date }
         : e
     ));
