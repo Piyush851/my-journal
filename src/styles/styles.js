@@ -1,336 +1,533 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
+
+    /* =======================================
+       GLOBAL LAYOUT
+    ======================================= */
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
+        backgroundColor: "#F8FAFC",
+        paddingHorizontal: 20,
+        paddingTop: 20,
     },
+
+    centered: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+
+    /* =======================================
+       AUTH SCREENS
+    ======================================= */
     authContainer: {
         flex: 1,
-        padding: 24,
-        justifyContent: 'center',
     },
+
     headerSection: {
-        alignItems: 'center',
-        marginBottom: 48,
+        alignItems: "center",
+        marginBottom: 40,
     },
+
     logo: {
-        fontSize: 64,
-        marginBottom: 16,
+        fontSize: 50,
+        marginBottom: 10,
     },
+
     title: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        color: '#1a1a1a',
-        marginBottom: 8,
-    },
-    subtitle: {
-        fontSize: 16,
-        color: '#666',
-    },
-    formSection: {
-        width: '100%',
-    },
-    input: {
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        padding: 16,
-        fontSize: 16,
-        marginBottom: 16,
-        borderWidth: 1,
-        borderColor: '#e0e0e0',
-        color: '#1a1a1a',
-    },
-    primaryButton: {
-        backgroundColor: '#007AFF',
-        borderRadius: 12,
-        padding: 16,
-        alignItems: 'center',
-        marginTop: 8,
-    },
-    primaryButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    secondaryButton: {
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        padding: 16,
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#007AFF',
-    },
-    secondaryButtonText: {
-        color: '#007AFF',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    divider: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginVertical: 24,
-    },
-    dividerLine: {
-        flex: 1,
-        height: 1,
-        backgroundColor: '#e0e0e0',
-    },
-    dividerText: {
-        marginHorizontal: 16,
-        color: '#999',
-        fontSize: 14,
-    },
-    linkButton: {
-        marginTop: 16,
-        alignItems: 'center',
-    },
-    linkButtonText: {
-        color: '#007AFF',
-        fontSize: 14,
-    },
-    demoText: {
-        textAlign: 'center',
-        color: '#999',
-        fontSize: 12,
-        marginTop: 16,
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: 24,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
-    },
-    headerTitle: {
         fontSize: 28,
-        fontWeight: 'bold',
-        color: '#1a1a1a',
+        fontWeight: "700",
+        color: "#0F172A",
+        marginBottom: 4,
     },
-    headerSubtitle: {
-        fontSize: 14,
-        color: '#666',
-        marginTop: 4,
+
+    subtitle: {
+        fontSize: 15,
+        color: "#64748B",
+        textAlign: "center",
     },
-    logoutButton: {
+
+    formSection: {
+        width: "100%",
+        marginTop: 10,
+    },
+
+    input: {
+        backgroundColor: "#FFFFFF",
+        borderRadius: 12,
+        paddingVertical: 14,
         paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 8,
-        backgroundColor: '#f0f0f0',
+        fontSize: 15,
+        color: "#0F172A",
+        marginBottom: 14,
+        borderWidth: 1,
+        borderColor: "#E2E8F0",
     },
+
+    primaryButton: {
+        backgroundColor: "#2563EB",
+        paddingVertical: 14,
+        borderRadius: 12,
+        alignItems: "center",
+        marginTop: 10,
+    },
+
+    primaryButtonText: {
+        color: "#FFFFFF",
+        fontSize: 16,
+        fontWeight: "600",
+    },
+
+    secondaryButton: {
+        paddingVertical: 14,
+        borderRadius: 12,
+        backgroundColor: "#F1F5F9",
+        alignItems: "center",
+        marginTop: 10,
+    },
+
+    secondaryButtonText: {
+        color: "#0F172A",
+        fontSize: 16,
+        fontWeight: "500",
+    },
+
+    linkButton: {
+        marginTop: 14,
+        alignItems: "center",
+    },
+
+    linkButtonText: {
+        color: "#2563EB",
+        fontSize: 15,
+        fontWeight: "500",
+    },
+
+    /* =======================================
+       HEADER BAR
+    ======================================= */
+    header: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 20,
+    },
+
+    headerTitle: {
+        fontSize: 26,
+        fontWeight: "700",
+        color: "#0F172A",
+    },
+
+    headerSubtitle: {
+        fontSize: 15,
+        color: "#64748B",
+    },
+
+    logoutButton: {
+        backgroundColor: "#FEE2E2",
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 10,
+    },
+
     logoutButtonText: {
-        color: '#007AFF',
+        color: "#B91C1C",
         fontSize: 14,
-        fontWeight: '600',
+        fontWeight: "600",
     },
+
+    /* =======================================
+       ENTRY LIST SCREEN
+    ======================================= */
     statsContainer: {
-        flexDirection: 'row',
-        padding: 16,
-        gap: 16,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 20,
     },
+
     statCard: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#FFFFFF",
+        marginRight: 12,
+        paddingVertical: 14,
         borderRadius: 16,
-        padding: 20,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 2,
+        alignItems: "center",
+        borderWidth: 1,
+        borderColor: "#E2E8F0",
     },
+
     statNumber: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        color: '#007AFF',
-        marginBottom: 4,
+        fontSize: 20,
+        fontWeight: "700",
+        color: "#0F172A",
     },
+
     statLabel: {
-        fontSize: 14,
-        color: '#666',
+        fontSize: 13,
+        color: "#64748B",
+        marginTop: 4,
     },
+
     entriesList: {
         flex: 1,
+    },
+
+    entryCard: {
+        backgroundColor: "#FFFFFF",
+        borderRadius: 16,
         padding: 16,
+        marginBottom: 14,
+        borderWidth: 1,
+        borderColor: "#E2E8F0",
     },
-    emptyState: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 60,
-    },
-    emptyEmoji: {
-        fontSize: 64,
-        marginBottom: 16,
-    },
-    emptyText: {
-        fontSize: 20,
-        fontWeight: '600',
-        color: '#1a1a1a',
+
+    entryHeader: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
         marginBottom: 8,
     },
-    emptySubtext: {
-        fontSize: 14,
-        color: '#999',
-    },
-    entryCard: {
-        backgroundColor: '#fff',
-        borderRadius: 16,
-        padding: 20,
-        marginBottom: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 2,
-    },
-    entryHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 12,
-    },
+
     entryMood: {
-        fontSize: 32,
+        fontSize: 24,
     },
+
     entryDate: {
-        fontSize: 12,
-        color: '#999',
+        fontSize: 13,
+        color: "#64748B",
     },
+
     entryTitle: {
         fontSize: 18,
-        fontWeight: '600',
-        color: '#1a1a1a',
-        marginBottom: 8,
-    },
-    entryContent: {
-        fontSize: 14,
-        color: '#666',
-        lineHeight: 20,
-    },
-    fab: {
-        position: 'absolute',
-        right: 24,
-        bottom: 24,
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        backgroundColor: '#007AFF',
-        alignItems: 'center',
-        justifyContent: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 8,
-    },
-    fabIcon: {
-        fontSize: 32,
-        color: '#fff',
-        fontWeight: '300',
-    },
-    modalContainer: {
-        flex: 1,
-        backgroundColor: '#f8f9fa',
-    },
-    modalHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: 16,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
-    },
-    modalTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: '#1a1a1a',
-    },
-    modalButton: {
-        fontSize: 16,
-        color: '#007AFF',
-    },
-    modalSaveButton: {
-        fontWeight: '600',
-    },
-    modalContent: {
-        flex: 1,
-        padding: 24,
-    },
-    label: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#1a1a1a',
-        marginBottom: 12,
-        marginTop: 8,
-    },
-    moodSelector: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 12,
-        marginBottom: 24,
-    },
-    moodOption: {
-        alignItems: 'center',
-        padding: 12,
-        borderRadius: 12,
-        backgroundColor: '#fff',
-        borderWidth: 2,
-        borderColor: '#e0e0e0',
-        minWidth: 70,
-    },
-    moodOptionSelected: {
-        borderColor: '#007AFF',
-        backgroundColor: '#E3F2FD',
-    },
-    moodEmoji: {
-        fontSize: 28,
+        fontWeight: "700",
+        color: "#0F172A",
         marginBottom: 4,
     },
+
+    entryContent: {
+        fontSize: 14,
+        color: "#475569",
+    },
+
+    /* =======================================
+       EMPTY STATE
+    ======================================= */
+    emptyState: {
+        marginTop: 60,
+        alignItems: "center",
+    },
+
+    emptyEmoji: {
+        fontSize: 60,
+        marginBottom: 10,
+    },
+
+    emptyText: {
+        fontSize: 20,
+        fontWeight: "700",
+        color: "#0F172A",
+        marginBottom: 4,
+    },
+
+    emptySubtext: {
+        fontSize: 14,
+        color: "#64748B",
+        textAlign: "center",
+        maxWidth: 240,
+    },
+
+    /* =======================================
+       ADD/EDIT ENTRY MODAL
+    ======================================= */
+    modalContainer: {
+        flex: 1,
+        backgroundColor: "#F8FAFC",
+    },
+
+    modalHeader: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+        backgroundColor: "#FFFFFF",
+        borderBottomWidth: 1,
+        borderBottomColor: "#E2E8F0",
+    },
+
+    modalButton: {
+        fontSize: 16,
+        color: "#2563EB",
+        fontWeight: "600",
+    },
+
+    modalSaveButton: {
+        fontWeight: "700",
+    },
+
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: "700",
+        color: "#0F172A",
+    },
+
+    modalContent: {
+        padding: 20,
+    },
+
+    label: {
+        fontSize: 15,
+        fontWeight: "600",
+        color: "#334155",
+        marginBottom: 6,
+    },
+
+    moodSelector: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 20,
+    },
+
+    moodOption: {
+        alignItems: "center",
+        padding: 10,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: "#E2E8F0",
+        backgroundColor: "#FFFFFF",
+        flex: 1,
+        marginHorizontal: 4,
+    },
+
+    moodOptionSelected: {
+        backgroundColor: "#DBEAFE",
+        borderColor: "#2563EB",
+    },
+
+    moodEmoji: {
+        fontSize: 26,
+    },
+
     moodLabel: {
-        fontSize: 12,
-        color: '#666',
+        fontSize: 13,
+        marginTop: 4,
+        color: "#475569",
     },
+
     titleInput: {
-        backgroundColor: '#fff',
+        backgroundColor: "#FFFFFF",
         borderRadius: 12,
-        padding: 16,
+        padding: 14,
         fontSize: 16,
-        marginBottom: 24,
+        color: "#0F172A",
+        marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#e0e0e0',
-        color: '#1a1a1a',
+        borderColor: "#E2E8F0",
     },
+
     contentInput: {
-        backgroundColor: '#fff',
+        backgroundColor: "#FFFFFF",
         borderRadius: 12,
-        padding: 16,
-        fontSize: 16,
-        height: 200,
+        padding: 14,
+        fontSize: 15,
+        height: 180,
+        color: "#0F172A",
         borderWidth: 1,
-        borderColor: '#e0e0e0',
-        color: '#1a1a1a',
+        borderColor: "#E2E8F0",
+        marginBottom: 20,
     },
+
     deleteButton: {
-        marginTop: 32,
-        padding: 16,
+        backgroundColor: "#FEE2E2",
+        paddingVertical: 14,
         borderRadius: 12,
-        backgroundColor: '#FFE5E5',
-        alignItems: 'center',
+        alignItems: "center",
+        marginTop: 10,
     },
+
     deleteButtonText: {
-        color: '#FF3B30',
+        color: "#B91C1C",
         fontSize: 16,
-        fontWeight: '600',
+        fontWeight: "600",
     },
-    centered: {
-        justifyContent: 'center',
-        alignItems: 'center',
+
+    /* =======================================
+       Floating Add Button
+    ======================================= */
+    fab: {
+        position: "absolute",
+        right: 20,
+        bottom: 30,
+        backgroundColor: "#2563EB",
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        justifyContent: "center",
+        alignItems: "center",
+        elevation: 5,
     },
-    buttonDisabled: {
-        opacity: 0.6,
+
+    fabIcon: {
+        color: "#FFFFFF",
+        fontSize: 30,
+        lineHeight: 30,
     },
+    /* Custom headers (Option B) */
+
+    customHeader: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 20,
+    },
+
+    homeTitle: {
+        fontSize: 24,
+        fontWeight: "700",
+        color: "#0F172A",
+    },
+
+    homeSubtitle: {
+        fontSize: 14,
+        color: "#64748B",
+        marginTop: 2,
+    },
+
+    logoutChip: {
+        paddingVertical: 6,
+        paddingHorizontal: 14,
+        backgroundColor: "#FEE2E2",
+        borderRadius: 12,
+    },
+
+    logoutChipText: {
+        color: "#B91C1C",
+        fontSize: 14,
+        fontWeight: "600",
+    },
+
+    /* Add/Edit Screen Header */
+    editorHeader: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+        backgroundColor: "#FFFFFF",
+        borderBottomWidth: 1,
+        borderBottomColor: "#E2E8F0",
+    },
+
+    headerBack: {
+        fontSize: 16,
+        color: "#2563EB",
+        fontWeight: "600",
+    },
+
+    headerTitle: {
+        fontSize: 17,
+        fontWeight: "700",
+        color: "#0F172A",
+    },
+
+    headerSave: {
+        fontSize: 16,
+        color: "#2563EB",
+        fontWeight: "700",
+    },
+
+    /* Screen titles for Login/Signup */
+    screenTitle: {
+        fontSize: 26,
+        fontWeight: "700",
+        color: "#0F172A",
+        textAlign: "center",
+        marginBottom: 6,
+    },
+
+    screenSubtitle: {
+        fontSize: 15,
+        color: "#64748B",
+        textAlign: "center",
+        marginBottom: 30,
+    },
+    /* Search bar */
+    searchBar: {
+        backgroundColor: "#FFFFFF",
+        borderRadius: 12,
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        fontSize: 15,
+        borderWidth: 1,
+        borderColor: "#E2E8F0",
+        marginBottom: 14,
+    },
+
+    /* Filter row */
+    filterRow: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        marginBottom: 12,
+    },
+
+    filterChip: {
+        paddingVertical: 6,
+        paddingHorizontal: 14,
+        backgroundColor: "#F1F5F9",
+        borderRadius: 20,
+        marginRight: 8,
+        marginBottom: 8,
+        borderWidth: 1,
+        borderColor: "#E2E8F0",
+    },
+
+    filterChipSelected: {
+        backgroundColor: "#DBEAFE",
+        borderColor: "#2563EB",
+    },
+
+    filterChipText: {
+        color: "#334155",
+        fontSize: 14,
+    },
+
+    filterChipSelectedText: {
+        color: "#1E40AF",
+        fontWeight: "600",
+    },
+
+    /* Sort buttons */
+    sortRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 12,
+    },
+
+    sortButton: {
+        paddingVertical: 6,
+        paddingHorizontal: 14,
+        borderRadius: 14,
+        backgroundColor: "#F1F5F9",
+        borderWidth: 1,
+        borderColor: "#E2E8F0",
+    },
+
+    sortButtonSelected: {
+        backgroundColor: "#DBEAFE",
+        borderColor: "#2563EB",
+    },
+
+    sortText: {
+        fontSize: 14,
+        color: "#334155",
+    },
+
+    sortTextSelected: {
+        color: "#1E40AF",
+        fontWeight: "600",
+    },
+
+
 });

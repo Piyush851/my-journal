@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     View,
     Text,
@@ -6,54 +6,146 @@ import {
     ScrollView,
     SafeAreaView,
     StatusBar,
+    TextInput,
 } from 'react-native';
 import ApiService from '../services/api';
 import styles from '../styles/styles';
+import { saveEntriesToCache, loadEntriesFromCache } from '../helpers/storage';
 
-export default function HomeScreen({ user, onAddEntry, onEditEntry, onLogout }) {
+export default function HomeScreen({ navigation, user, onLogout }) {
     const [entries, setEntries] = useState([]);
+    const [search, setSearch] = useState("");
+    const [filterMood, setFilterMood] = useState("all");
+    const [sortOrder, setSortOrder] = useState("newest");
 
-    // ✅ Load entries when screen opens
-    useEffect(() => {
-        loadEntries();
-    }, []);
+    // ✅ Load from cache instantly
+    const loadCache = async () => {
+        const cached = await loadEntriesFromCache();
 
-    // ✅ Fetch from backend
-    const loadEntries = async () => {
+        const normalized = cached.map(e => ({
+            ...e,
+            date: e.date ? new Date(e.date) : new Date(),
+        }));
+
+        setEntries(normalized);
+    };
+
+
+    // ✅ Load from backend & update cache
+    const loadFromServer = useCallback(async () => {
         try {
             const res = await ApiService.getEntries();
-
             const normalized = res.entries.map(e => ({
                 ...e,
-                date: new Date(e.date)  // ✅ Fix string → Date
+                date: new Date(e.date),
+                syncStatus: "synced",
             }));
-
             setEntries(normalized);
+            saveEntriesToCache(normalized);
+        } catch (err) {
+            console.log("❌ Online load error:", err.message);
+        }
+    }, []);
 
-        } catch (error) {
-            console.log("❌ Error loading entries:", error.message);
+
+    useEffect(() => {
+        loadCache();       // Instant load
+        loadFromServer();  // Background refresh
+
+        const unsub = navigation.addListener("focus", loadFromServer);
+        return unsub;
+    }, []);
+
+    // ✅ Save new entry (optimistic UI)
+    const handleAddEntry = async (data) => {
+        const tempId = "temp_" + Date.now();
+        const newEntry = {
+            _id: tempId,
+            ...data,
+            date: new Date(),
+            syncStatus: "pending",
+        };
+
+        setEntries(prev => {
+            const updated = [...prev, newEntry];
+            saveEntriesToCache(updated);
+            return updated;
+        });
+
+        try {
+            await ApiService.createEntry(data);
+            loadFromServer();
+        } catch (err) {
+            console.log("❌ Failed to sync new entry:", err.message);
         }
     };
 
-    const sortedEntries = [...entries].sort((a, b) => b.date - a.date);
-
-    const formatDate = (date) => {
-        return date.toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
+    // ✅ Update entry (optimistic)
+    const handleUpdateEntry = async (id, data) => {
+        setEntries(prev => {
+            const updated = prev.map(e =>
+                e._id === id ? { ...e, ...data, syncStatus: "pending" } : e
+            );
+            saveEntriesToCache(updated);
+            return updated;
         });
+
+        try {
+            await ApiService.updateEntry(id, data);
+            loadFromServer();
+        } catch (err) {
+            console.log("❌ Update sync error:", err.message);
+        }
     };
 
-    const getMoodEmoji = (mood) => {
-        const moods = {
-            happy: "😊",
-            sad: "😢",
-            excited: "🤩",
-            calm: "😌",
-            anxious: "😰",
-        };
-        return moods[mood] || "😊";
+    // ✅ Delete entry (optimistic)
+    const handleDeleteEntry = async (id) => {
+        setEntries(prev => {
+            const updated = prev.filter(e => e._id !== id);
+            saveEntriesToCache(updated);
+            return updated;
+        });
+
+        try {
+            await ApiService.deleteEntry(id);
+            loadFromServer();
+        } catch (err) {
+            console.log("❌ Delete sync error:", err.message);
+        }
+    };
+
+    // ✅ Search + Filter + Sort
+    const filteredEntries = entries
+        .filter((e) => {
+            if (filterMood !== "all" && e.mood !== filterMood) return false;
+            if (search.trim()) {
+                const q = search.toLowerCase();
+                return (
+                    e.title?.toLowerCase().includes(q) ||
+                    e.content?.toLowerCase().includes(q)
+                );
+            }
+            return true;
+        })
+        .sort((a, b) => (sortOrder === "newest" ? b.date - a.date : a.date - b.date));
+
+    const moodEmoji = {
+        happy: "😊",
+        sad: "😢",
+        excited: "🤩",
+        calm: "😌",
+        anxious: "😰",
+    };
+
+    const formatDate = (date) => {
+        if (!date) return "Unknown";
+        if (!(date instanceof Date)) date = new Date(date);
+
+        return date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        });
     };
 
     return (
@@ -61,51 +153,88 @@ export default function HomeScreen({ user, onAddEntry, onEditEntry, onLogout }) 
             <StatusBar barStyle="dark-content" />
 
             {/* Header */}
-            <View style={styles.header}>
+            <View style={styles.customHeader}>
                 <View>
-                    <Text style={styles.headerTitle}>My Journal</Text>
-                    <Text style={styles.headerSubtitle}>Hello, {user.name}!</Text>
+                    <Text style={styles.homeTitle}>My Journal</Text>
+                    <Text style={styles.homeSubtitle}>Hello, {user?.name}</Text>
                 </View>
-                <TouchableOpacity onPress={onLogout} style={styles.logoutButton}>
-                    <Text style={styles.logoutButtonText}>Logout</Text>
+
+                <TouchableOpacity
+                    onPress={() => navigation.navigate("Stats")}
+                    style={styles.logoutChip}
+                >
+                    <Text style={styles.logoutChipText}>Stats</Text>
+                </TouchableOpacity>
+
+
+                <TouchableOpacity onPress={onLogout} style={styles.logoutChip}>
+                    <Text style={styles.logoutChipText}>Logout</Text>
                 </TouchableOpacity>
             </View>
 
-            {/* Stats */}
-            <View style={styles.statsContainer}>
-                <View style={styles.statCard}>
-                    <Text style={styles.statNumber}>{entries.length}</Text>
-                    <Text style={styles.statLabel}>Total Entries</Text>
-                </View>
+            {/* Search */}
+            <TextInput
+                placeholder="Search entries..."
+                placeholderTextColor="#999"
+                style={styles.searchBar}
+                value={search}
+                onChangeText={setSearch}
+            />
 
-                <View style={styles.statCard}>
-                    <Text style={styles.statNumber}>
-                        {entries.filter(e => {
-                            const today = new Date();
-                            return e.date.toDateString() === today.toDateString();
-                        }).length}
-                    </Text>
-                    <Text style={styles.statLabel}>Today</Text>
-                </View>
+            {/* Mood Filters */}
+            <View style={styles.filterRow}>
+                {[
+                    { key: "all", label: "All" },
+                    { key: "happy", label: "😊 Happy" },
+                    { key: "sad", label: "😢 Sad" },
+                    { key: "excited", label: "🤩 Excited" },
+                    { key: "calm", label: "😌 Calm" },
+                    { key: "anxious", label: "😰 Anxious" },
+                ].map((m) => (
+                    <TouchableOpacity
+                        key={m.key}
+                        style={[
+                            styles.filterChip,
+                            filterMood === m.key && styles.filterChipSelected,
+                        ]}
+                        onPress={() => setFilterMood(m.key)}
+                    >
+                        <Text
+                            style={[
+                                styles.filterChipText,
+                                filterMood === m.key && styles.filterChipSelectedText,
+                            ]}
+                        >
+                            {m.label}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
             </View>
+
 
             {/* Entries */}
             <ScrollView style={styles.entriesList} showsVerticalScrollIndicator={false}>
-                {sortedEntries.length === 0 ? (
+                {filteredEntries.length === 0 ? (
                     <View style={styles.emptyState}>
                         <Text style={styles.emptyEmoji}>📝</Text>
-                        <Text style={styles.emptyText}>No entries yet</Text>
-                        <Text style={styles.emptySubtext}>Start your journaling journey today!</Text>
+                        <Text style={styles.emptyText}>No matching entries</Text>
+                        <Text style={styles.emptySubtext}>Try adjusting search or filters</Text>
                     </View>
                 ) : (
-                    sortedEntries.map((entry) => (
+                    filteredEntries.map((entry) => (
                         <TouchableOpacity
-                            key={entry._id}     // ✅ FIXED
+                            key={entry._id}
                             style={styles.entryCard}
-                            onPress={() => onEditEntry(entry)}
+                            onPress={() =>
+                                navigation.navigate("AddEdit", {
+                                    entry,
+                                    onSave: (data) => handleUpdateEntry(entry._id, data),
+                                    onDelete: () => handleDeleteEntry(entry._id),
+                                })
+                            }
                         >
                             <View style={styles.entryHeader}>
-                                <Text style={styles.entryMood}>{getMoodEmoji(entry.mood)}</Text>
+                                <Text style={styles.entryMood}>{moodEmoji[entry.mood]}</Text>
                                 <Text style={styles.entryDate}>{formatDate(entry.date)}</Text>
                             </View>
 
@@ -113,13 +242,26 @@ export default function HomeScreen({ user, onAddEntry, onEditEntry, onLogout }) 
                             <Text style={styles.entryContent} numberOfLines={2}>
                                 {entry.content}
                             </Text>
+
+                            {entry.syncStatus === "pending" && (
+                                <Text style={{ fontSize: 12, color: "#EF4444", marginTop: 4 }}>
+                                    Syncing…
+                                </Text>
+                            )}
                         </TouchableOpacity>
                     ))
                 )}
             </ScrollView>
 
-            {/* Add Button */}
-            <TouchableOpacity style={styles.fab} onPress={onAddEntry}>
+            {/* Add button */}
+            <TouchableOpacity
+                style={styles.fab}
+                onPress={() =>
+                    navigation.navigate("AddEdit", {
+                        onSave: handleAddEntry,
+                    })
+                }
+            >
                 <Text style={styles.fabIcon}>+</Text>
             </TouchableOpacity>
         </SafeAreaView>
