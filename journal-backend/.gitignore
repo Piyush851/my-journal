@@ -1,4 +1,26 @@
-node_modules/
+# Keystore files (Android signing keys)
+*.keystore
+*.jks
+*.p12
+
+# Environment variables
 .env
-.DS_Store
+journal-backend/.env
+
+# Node modules
+node_modules/
+journal-backend/node_modules/
+
+# Build outputs
+android/app/build/
+android/build/
+
+# APK outputs
+*.apk
+
+# Metro bundler
 *.log
+*.tmp
+
+# macOS junk
+.DS_Store

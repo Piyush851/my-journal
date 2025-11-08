@@ -1,1 +1,1 @@
-export const API_URL = "http://192.168.1.3:5000/api";
+export const API_URL = "https://my-journal-dgfs.onrender.com/api";
